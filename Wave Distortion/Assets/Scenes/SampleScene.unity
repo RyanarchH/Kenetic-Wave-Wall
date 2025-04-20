@@ -135,7 +135,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &72628196
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -352,7 +352,7 @@ Transform:
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2, z: -10}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -376,7 +376,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1361955971
 Transform:
   m_ObjectHideFlags: 0
@@ -441,6 +441,80 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 10, y: 4, z: 0.1}
   m_Center: {x: 0, y: 2, z: 0}
+--- !u!1 &1918816079
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1918816081}
+  - component: {fileID: 1918816080}
+  - component: {fileID: 1918816082}
+  m_Layer: 0
+  m_Name: LineGridController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1918816080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1918816079}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2ff2d5abf6f0d44fa2cc59ad42ddd85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lineCount: 100
+  lineSpacing: 0.1
+  lineHeight: 5
+  lineMaterial: {fileID: 2100000, guid: 4050c050dc5ac77499e5dc7631fa9c62, type: 2}
+  lineWidth: 0.02
+  lines: []
+  originalXPositions: []
+--- !u!4 &1918816081
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1918816079}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1918816082
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1918816079}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bd83ecab157c1d449fb44769ac380fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gridGenerator: {fileID: 1918816080}
+  interactionRadius: 0.5
+  maxOffset: 5
+  smoothSpeed: 10
+  arcSharpness: 1
+  wiggleAmount: 0
+  wiggleSpeed: 3
+  stiffness: 100
+  damping: 5
+  anchorTension: 2
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -449,3 +523,4 @@ SceneRoots:
   - {fileID: 705507995}
   - {fileID: 72628197}
   - {fileID: 1361955971}
+  - {fileID: 1918816081}

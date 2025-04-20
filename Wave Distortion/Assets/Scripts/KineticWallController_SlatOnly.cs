@@ -26,7 +26,7 @@ public class KineticWallController : MonoBehaviour
     private float[] vertexVelocities;
     private Mesh slatMesh;
     
-
+    
     void Awake()
     {
         InitializeSlats();

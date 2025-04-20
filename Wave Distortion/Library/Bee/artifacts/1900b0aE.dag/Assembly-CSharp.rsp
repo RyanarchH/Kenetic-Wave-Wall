@@ -402,6 +402,8 @@
 -analyzer:"C:/Program Files/Unity/6000.0.40f1/Editor/Data/Tools/Unity.SourceGenerators/Unity.UIToolkit.SourceGenerator.dll"
 "Assets/Scripts/InteractionController.cs"
 "Assets/Scripts/KineticWallController_SlatOnly.cs"
+"Assets/Scripts/LineDeformer.cs"
+"Assets/Scripts/LineGridGenrator.cs"
 -langversion:9.0
 /deterministic
 /optimize+
