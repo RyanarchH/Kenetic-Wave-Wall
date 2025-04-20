@@ -61,7 +61,7 @@ public class LineGridGenerator : MonoBehaviour
             lineObj.transform.parent = this.transform;
 
             LineRenderer lr = lineObj.AddComponent<LineRenderer>();
-            lr.positionCount = 10;
+            lr.positionCount = 30;
             lr.material = lineMaterial;
             lr.widthMultiplier = lineWidth;
             lr.useWorldSpace = false;

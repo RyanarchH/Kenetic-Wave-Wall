@@ -507,7 +507,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridGenerator: {fileID: 1918816080}
   interactionRadius: 0.5
-  maxOffset: 5
+  maxOffset: 4
   smoothSpeed: 10
   arcSharpness: 1
   wiggleAmount: 0
@@ -515,6 +515,10 @@ MonoBehaviour:
   stiffness: 100
   damping: 5
   anchorTension: 2
+  yFalloffWeight: 1
+  rippleDecayTime: 2
+  rippleMaxStrength: 3
+  rippleFalloff: 1.5
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

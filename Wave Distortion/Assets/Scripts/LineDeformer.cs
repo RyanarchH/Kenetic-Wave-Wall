@@ -1,4 +1,13 @@
 using UnityEngine;
+using System.Collections.Generic;
+
+[System.Serializable]
+public struct RipplePoint
+{
+    public Vector3 position;
+    public float strength;
+    public float timeCreated;
+}
 
 public class LineDeformer : MonoBehaviour
 {
@@ -17,17 +26,32 @@ public class LineDeformer : MonoBehaviour
     public float stiffness = 100f;
     public float damping = 15f;   
 
+    [Header("Anti-Overlap Settings")]
+    [Range(0f, 0.2f)]
+    public float spacingThreshold = 0.05f; // minimum spacing between lines after bending
+
     [Header("Anchoring")]
     [Range(0.1f, 5f)]
     public float anchorTension = 2f; // Controls how tightly top/bottom are anchored
 
     private Vector3[] targetOffsets;            // Target deformation per line
     private bool isDragging = false;
+    private bool isDraggingAndMoving = false;
+
     private Vector3 lastMouseWorldPos;
     private float[] offsetVelocities; 
     private float currentDragX = 0f;
+    
+    [Header("Falloff Settings")]
+    public float yFalloffWeight = 1f; // 0.5 = less vertical influence, 2 = more    
 
 
+    private List<RipplePoint> ripplePoints = new List<RipplePoint>();
+
+    [Header("Ripple Settings")]
+    public float rippleDecayTime = 2.0f;     // How long a ripple lasts
+    public float rippleMaxStrength = 3.0f;   // Strength of ripple influence
+    public float rippleFalloff = 1.5f;         // Tightness of ripple effect
 
 
 
@@ -49,14 +73,26 @@ public class LineDeformer : MonoBehaviour
         if (isDragging)
         {
             Vector3 dragDelta = mouseWorldPos - lastMouseWorldPos;
-            currentDragX = dragDelta.x / Time.deltaTime;
-            lastMouseWorldPos = mouseWorldPos;
+
+            if (dragDelta.magnitude > 0.01f)
+            {
+                currentDragX = dragDelta.x / Time.deltaTime;
+                lastMouseWorldPos = mouseWorldPos;
+                isDraggingAndMoving = true; // ✅ actually moving
+            }
+            else
+            {
+                currentDragX = 0f;
+                isDraggingAndMoving = false; // ✅ just holding
+            }
         }
         else
         {
-            // Smooth decay after release
             currentDragX = Mathf.Lerp(currentDragX, 0f, Time.deltaTime * 5f);
+            isDraggingAndMoving = false;
         }
+
+
 
         for (int i = 0; i < gridGenerator.lineCount; i++)
         {
@@ -64,17 +100,54 @@ public class LineDeformer : MonoBehaviour
             float baseX = gridGenerator.originalXPositions[i];
 
             // Calculate falloff based on proximity to interaction point
+            // Position of interaction point (shifted slightly for fluid drag)
+            Vector3 interactionPoint = mouseWorldPos - new Vector3(currentDragX * 0.05f, 0f, 0f);
+            // Position of line's center
             Vector3 lineMid = new Vector3(baseX, 0f, 0f);
-            Vector3 interactionPoint = mouseWorldPos - new Vector3(currentDragX * 0.05f, 0f, 0f); // small trailing effect
-            float distance = Mathf.Abs(interactionPoint.x - lineMid.x);
-            float falloff = Mathf.Exp(-distance * distance * 4f);
 
+            // Compute both X and Y distance
+            float dx = interactionPoint.x - lineMid.x;
+            //float dy = (interactionPoint.y - lineMid.y) * yFalloffWeight;
+            // Distance from cursor in 2D space
+            //float distance = Mathf.Sqrt(dx * dx + dy * dy);
+            float distance = Mathf.Abs(dx);
+            // Final 2D falloff curve
+            //float falloff = Mathf.Exp(-distance * distance * 4f);
+            float falloff = Mathf.Exp(-distance * distance * 2f);
+            
             // === ALWAYS assign target offset ===
-            float offsetAmount = 0f;
-
-            if (isDragging)
+            float offsetAmount = 0f;            
+            
+            // === Ripple Trail Effect ===
+            for (int r = ripplePoints.Count - 1; r >= 0; r--)
             {
-                offsetAmount = falloff * maxOffset * Mathf.Clamp(currentDragX, -1f, 1f);
+                RipplePoint ripple = ripplePoints[r];
+                float age = Time.time - ripple.timeCreated;
+
+                if (age > rippleDecayTime)
+                {
+                    ripplePoints.RemoveAt(r);
+                    continue;
+                }
+
+                float rippleProgress = 1f - (age / rippleDecayTime); // fades out
+                float rippleDistance = Mathf.Abs(ripple.position.x - lineMid.x);
+                float rippleInfluence = Mathf.Exp(-rippleDistance * rippleDistance * rippleFalloff) * rippleProgress;
+
+                // Add ripple bend directionally based on old drag strength and pulse animation
+                float wavePulse = Mathf.Sin((age / rippleDecayTime) * Mathf.PI); // 0 → 1 → 0
+                offsetAmount += rippleInfluence * rippleMaxStrength * wavePulse * Mathf.Sign(currentDragX);
+            }
+
+
+
+            if (isDraggingAndMoving)
+            {
+                offsetAmount = falloff * maxOffset * Mathf.Abs(currentDragX) * Mathf.Sign(currentDragX);
+            }
+            else
+            {
+                offsetAmount = 0f; // ✅ No active drag = no bend
             }
 
             targetOffsets[i] = new Vector3(offsetAmount, 0f, 0f);
@@ -97,16 +170,57 @@ public class LineDeformer : MonoBehaviour
             }
 
             float smoothedOffsetX = currentOffsetX;
+            // Save current bent position
+            float bentX = baseX + smoothedOffsetX;
+            // Check against previous line
+            if (i > 0)
+            {
+                float prevBentX = gridGenerator.originalXPositions[i - 1] + (gridGenerator.lines[i - 1].GetPosition(0).x - gridGenerator.originalXPositions[i - 1]);
+
+                float spacing = bentX - prevBentX;
+                if (spacing < spacingThreshold)
+                {
+                    // Apply soft push back
+                    float pushAmount = (spacingThreshold - spacing) * 0.5f;
+                    smoothedOffsetX += pushAmount;
+                }
+            }
+
+            // Check against next line
+            if (i < gridGenerator.lineCount - 1)
+            {
+                float nextBentX = gridGenerator.originalXPositions[i + 1] + (gridGenerator.lines[i + 1].GetPosition(0).x - gridGenerator.originalXPositions[i + 1]);
+
+                float spacing = nextBentX - bentX;
+                if (spacing < spacingThreshold)
+                {
+                    float pushAmount = (spacingThreshold - spacing) * 0.5f;
+                    smoothedOffsetX -= pushAmount;
+                }
+            }
+
 
             // === APPLY BENDING TO LINE ===
             int points = lr.positionCount;
             for (int j = 0; j < points; j++)
             {
-                float t = j / (float)(points - 1); // 0 (bottom) → 1 (top)
+                float t = j / (float)(points - 1);
 
-                // Anchoring using bell curve
+                // Map cursor Y to line height
+                float localY = Mathf.Lerp(-lineHeight / 2f, lineHeight / 2f, t);
+                float cursorOffsetY = interactionPoint.y;
+
+                // Calculate distance of each point from cursor Y
+                float dy = cursorOffsetY - localY;
+
+                // Bell curve arc: max bend near cursor Y, anchored elsewhere
+                float yBias = Mathf.Exp(-dy * dy * 0.1f); // center = 1, edges = 0
+
+                // Combine with anchor curve (optional, or remove to simplify)
                 float anchorFalloff = Mathf.Pow(Mathf.Sin(t * Mathf.PI), anchorTension);
-                float bendX = smoothedOffsetX * anchorFalloff;
+
+                // Final bending strength at this point
+                float bendX = smoothedOffsetX * anchorFalloff * yBias;
 
                 // Optional wiggle effect during drag
                 if (isDragging && wiggleAmount > 0f)
@@ -132,6 +246,15 @@ public class LineDeformer : MonoBehaviour
         else if (Input.GetMouseButtonUp(0))
         {
             isDragging = false;
+
+            // 🌀 Create ripple on release
+            RipplePoint rp = new RipplePoint
+            {
+                position = lastMouseWorldPos,
+                strength = Mathf.Abs(currentDragX),
+                timeCreated = Time.time
+            };
+            ripplePoints.Add(rp);
         }
     }
 
@@ -148,5 +271,15 @@ public class LineDeformer : MonoBehaviour
 
         Gizmos.color = new Color(1f, 0.2f, 0.2f, 0.2f);
         Gizmos.DrawSphere(lastMouseWorldPos, interactionRadius);
+
+        foreach (var ripple in ripplePoints)
+        {
+            float age = Time.time - ripple.timeCreated;
+            if (age > rippleDecayTime) continue;
+
+            float progress = 1f - (age / rippleDecayTime);
+            Gizmos.color = new Color(0.2f, 0.5f, 1f, progress * 0.2f);
+            Gizmos.DrawSphere(ripple.position, interactionRadius * progress);
+        }
     }
 }
