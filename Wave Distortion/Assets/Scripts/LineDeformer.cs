@@ -147,7 +147,7 @@ public class LineDeformer : MonoBehaviour
             }
             else
             {
-                offsetAmount = 0f; //  No active drag = no bend
+                offsetAmount = 0f; // ✅ No active drag = no bend
             }
 
             targetOffsets[i] = new Vector3(offsetAmount, 0f, 0f);
@@ -172,7 +172,6 @@ public class LineDeformer : MonoBehaviour
             float smoothedOffsetX = currentOffsetX;
             // Save current bent position
             float bentX = baseX + smoothedOffsetX;
-            
             // Check against previous line
             if (i > 0)
             {
@@ -200,9 +199,9 @@ public class LineDeformer : MonoBehaviour
                 }
             }
 
-            int points = lr.positionCount;
 
             // === APPLY BENDING TO LINE ===
+            int points = lr.positionCount;
             for (int j = 0; j < points; j++)
             {
                 float t = j / (float)(points - 1);
