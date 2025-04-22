@@ -28,7 +28,7 @@ public class LineDeformer : MonoBehaviour
 
     [Header("Anti-Overlap Settings")]
     [Range(0f, 0.2f)]
-    public float spacingThreshold = 0.05f; // minimum spacing between lines after bending
+    public float spacingThreshold = 0.02f; // minimum spacing between lines after bending
 
     [Header("Anchoring")]
     [Range(0.1f, 5f)]
