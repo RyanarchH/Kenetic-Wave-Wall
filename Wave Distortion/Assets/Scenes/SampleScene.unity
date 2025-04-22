@@ -514,12 +514,16 @@ MonoBehaviour:
   wiggleSpeed: 3
   stiffness: 100
   damping: 5
+<<<<<<< HEAD
   spacingThreshold: 0.05
   anchorTension: 1
   yFalloffWeight: 1
   rippleDecayTime: 2
   rippleMaxStrength: 3
   rippleFalloff: 1.5
+=======
+  anchorTension: 2
+>>>>>>> parent of cc644c6 (Add ripple wave.)
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
