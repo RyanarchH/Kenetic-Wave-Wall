@@ -68,6 +68,20 @@ public class LineGridGenerator : MonoBehaviour
             lr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             lr.receiveShadows = false;
 
+            // Add color gradient: bottom to top
+            Gradient gradient = new Gradient();
+            gradient.SetKeys(
+                new GradientColorKey[] {
+                    new GradientColorKey(new Color(0.9f, 0.85f, 0.8f), 0f),   // bottom
+                    new GradientColorKey(Color.white, 1f)                    // top
+                },
+                new GradientAlphaKey[] {
+                    new GradientAlphaKey(1f, 0f),
+                    new GradientAlphaKey(1f, 1f)
+                }
+            );
+            lr.colorGradient = gradient;
+
             float x = (i * lineSpacing) - halfWidth;
             originalXPositions[i] = x;
 

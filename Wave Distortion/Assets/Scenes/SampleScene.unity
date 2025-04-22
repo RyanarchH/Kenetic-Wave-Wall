@@ -473,7 +473,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineCount: 100
   lineSpacing: 0.1
-  lineHeight: 5
+  lineHeight: 10
   lineMaterial: {fileID: 2100000, guid: 4050c050dc5ac77499e5dc7631fa9c62, type: 2}
   lineWidth: 0.02
   lines: []
@@ -514,6 +514,7 @@ MonoBehaviour:
   wiggleSpeed: 3
   stiffness: 100
   damping: 5
+  spacingThreshold: 0.05
   anchorTension: 2
   yFalloffWeight: 1
   rippleDecayTime: 2
