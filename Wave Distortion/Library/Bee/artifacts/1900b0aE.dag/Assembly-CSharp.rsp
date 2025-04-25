@@ -430,6 +430,8 @@
 "Assets/Scripts/KineticWallController_SlatOnly.cs"
 "Assets/Scripts/LineDeformer.cs"
 "Assets/Scripts/LineGridGenrator.cs"
+"Assets/Scripts/MeshDeformer.cs"
+"Assets/Scripts/MeshGridGenerator.cs"
 -langversion:9.0
 /deterministic
 /optimize+
